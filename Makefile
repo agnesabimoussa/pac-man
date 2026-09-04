@@ -2,7 +2,7 @@
 
 PYTHON := python3
 MAIN := src/pac-man.py
-CONFIG := inputs/config.json
+CONFIG := configuration/config.json
 
 install:
 	uv sync

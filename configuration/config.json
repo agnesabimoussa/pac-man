@@ -1,0 +1,22 @@
+// Example configuration file:
+{
+    # highscore storage
+    "highscore_filename": "data/highscores.json",
+
+    // maze size for level 1 (later levels are generated independently)
+    "width": 21,
+    "height": 21,
+    "seed": 42,
+
+    "lives": 3,
+    "level_max_time": 90,
+
+    # scoring
+    "points_per_pacgum": 10,
+    "points_per_super_pacgum": 50,
+    "points_per_ghost": 200,
+
+    // movement
+    "player_speed": 4.0,
+    "ghost_speed": 3.5
+}
