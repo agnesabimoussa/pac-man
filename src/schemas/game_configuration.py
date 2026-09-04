@@ -24,6 +24,11 @@ class GameConfiguration(BaseModel):
         ge=5,
         le=101,
         description="Maze height in cells, passed to the maze generator.")
+    levels: int = Field(
+        default=10,
+        ge=1,
+        le=100,
+        description="Number of levels in the game (subject requires >= 10).")
     lives: int = Field(
         default=3,
         ge=1,
@@ -42,8 +47,9 @@ class GameConfiguration(BaseModel):
         ge=0,
         description="Score awarded per edible ghost eaten.")
     seed: int | None = Field(
-        default=42,
-        description="Fixed seed for level 1's maze; null means random.")
+        default=0,
+        description="Fixed seed for level 1's maze; 0 or null means "
+        "random, matching the maze generator's own convention.")
     level_max_time: int = Field(
         default=90,
         ge=10,

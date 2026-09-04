@@ -1,0 +1,14 @@
+{
+    "scores": [
+        {"name": "AGNES", "score": 4200},
+        {"name": "MIISSA", "score": 3780},
+        {"name": "SANNAKA", "score": 3150},
+        {"name": "WAKA WAKA", "score": 2600},
+        {"name": "FOLIOLE", "score": 2100},
+        {"name": "MARMELADE", "score": 1750},
+        {"name": "GOLDFISH", "score": 1300},
+        {"name": "BOB", "score": 900},
+        {"name": "CLYDE 42", "score": 450},
+        {"name": "PLAYER", "score": 100}
+    ]
+}
