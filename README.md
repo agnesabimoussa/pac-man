@@ -44,6 +44,8 @@ content are not stripped):
 | `level_max_time` | int | `90` | Time limit per level, in seconds. Range `[10, 3600]`. |
 | `player_speed` | float | `4.0` | Player movement speed, tiles per second. Range `(0, 20]`. |
 | `ghost_speed` | float | `3.5` | Ghost movement speed, tiles per second. Range `(0, 20]`. |
+| `frightened_seconds` | float | `8.0` | How long ghosts stay edible after a super-pacgum. Range `(0, 60]`. |
+| `ghost_respawn_seconds` | float | `7.0` | How long an eaten ghost takes to respawn at its corner. Range `(0, 60]`. |
 
 ## Example
 
@@ -69,7 +71,11 @@ content are not stripped):
 
     // movement
     "player_speed": 4.0,
-    "ghost_speed": 3.5
+    "ghost_speed": 3.5,
+
+    // ghost timing
+    "frightened_seconds": 8.0,
+    "ghost_respawn_seconds": 7.0
 }
 ```
 
@@ -122,6 +128,41 @@ Never crashes on a bad highscore file:
   top 10 by score are kept.
 
 # Maze Generation
+
+# Ghosts
+
+Four ghosts, one per corner of the maze, each moving one cell at a time
+towards a target cell chosen by BFS shortest path over the maze's
+wall-bitmask grid (`src/maze/pathfinding.py`).
+
+## States
+
+Every ghost (`Ghost`, `src/entities/ghost.py`) is one of three states:
+
+- **`CHASING`** — default. Targets a cell chosen by its own chase
+  strategy (see below) and paths towards it. Touching the player costs a
+  life.
+- **`FRIGHTENED`** — edible, triggered for every ghost at once by eating
+  a super-pacgum, for `frightened_seconds`. Flees to whichever reachable
+  cell is farthest from the player. Touching the player gets the ghost
+  eaten (`+points_per_ghost`, state becomes `EATEN`) instead of costing a
+  life.
+- **`EATEN`** — harmless "eyes returning home" state. Paths back towards
+  its home corner and, after `ghost_respawn_seconds`, respawns there and
+  resumes `CHASING`.
+
+## Chase strategies
+
+`CHASING` behavior is the only thing that differs between ghosts — each
+is a `Ghost` subclass overriding `target_tile()` (agreed in
+`aabi-mou/GHOSTS.md`):
+
+| Ghost | Strategy |
+|---|---|
+| `Blinky` | Direct chase — targets the player's current cell. |
+| `Pinky` | Ambush — targets a few cells ahead of the player, in the direction the player is currently facing. |
+| `Inky` | Flanking — targets the player's position reflected through Blinky's position; falls back to a random cell if no `Blinky` is present. |
+| `Clyde` | Shy — targets the player directly while far away, but retreats to its own home corner once within a short distance. |
 
 # Implementation
 

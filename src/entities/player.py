@@ -1,7 +1,9 @@
 import re
 import sys
 import time
+from typing import Tuple
 
+from entities.direction import Direction
 from schemas.highscores import Highscores, Score
 
 NAME_PATTERN = re.compile(r"^[A-Za-z0-9 ]+$")
@@ -21,6 +23,9 @@ class Player:
         name: Player name, entered at game over and saved to highscores.
         lives: Remaining lives.
         score: Accumulated score.
+        position: Current (x, y) cell in the maze.
+        direction: Current facing direction, updated on every move (also
+            used by ghosts, e.g. Pinky's ambush targeting).
     """
 
     def __init__(self, lives: int) -> None:
@@ -32,7 +37,20 @@ class Player:
         self.name = ""
         self.lives = lives
         self.score = 0
+        self.position: Tuple[int, int] = (0, 0)
+        self.direction = Direction.EAST
         self._start_time = time.monotonic()
+
+    def move_to(
+            self, position: Tuple[int, int], direction: Direction) -> None:
+        """Update the player's position and facing direction.
+
+        Args:
+            position: The player's new (x, y) cell.
+            direction: The direction just moved in.
+        """
+        self.position = position
+        self.direction = direction
 
     def set_name(self, name: str) -> None:
         """Set the player's name, entered at game over.

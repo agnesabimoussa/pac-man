@@ -65,3 +65,14 @@ class GameConfiguration(BaseModel):
         gt=0,
         le=20,
         description="Ghost movement speed, in tiles per second.")
+    frightened_seconds: float = Field(
+        default=8.0,
+        gt=0,
+        le=60,
+        description="How long ghosts stay edible after a super-pacgum.")
+    ghost_respawn_seconds: float = Field(
+        default=7.0,
+        gt=0,
+        le=60,
+        description="How long an eaten ghost takes to respawn at its "
+        "corner.")
