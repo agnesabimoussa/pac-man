@@ -8,13 +8,7 @@ from schemas.highscores import Highscores, Score
 
 
 class HighscoreLoader:
-    """Loads the persistent highscore table from disk.
-
-    Never raises for file-shaped problems (missing file, invalid JSON,
-    invalid entries) — those are all recoverable per subject §V.5, so
-    `load()` always returns a usable `Highscores`, falling back to an
-    empty one and logging a warning as needed.
-    """
+    """Loads the persistent highscore table from disk."""
 
     def __init__(self, filename: str) -> None:
         """Store the path to the highscore file.
@@ -27,15 +21,9 @@ class HighscoreLoader:
     def load(self) -> Highscores:
         """Load and validate the highscore table.
 
-        A missing file means there are no highscores at all yet (not an
-        error). Invalid JSON, a wrong top-level shape, or individually
-        invalid entries are logged and skipped rather than failing the
-        whole load. If fewer than 10 valid entries are found, exactly
-        those are returned — the result is never padded.
-
         Returns:
-            The highscore table, sorted by score (descending, ties broken
-            alphabetically by name), capped at 10 entries.
+            The highscore table, sorted by score descending, capped at
+            10 entries.
         """
         try:
             with open(self.filename, "r", encoding="utf-8") as fd:

@@ -14,13 +14,11 @@ def neighbors(maze: List[List[int]], cell: Cell) -> List[Cell]:
     """List the cells reachable from `cell` in a single step.
 
     Args:
-        maze: Row-major wall-bitmask grid ([y][x]) as produced by
-            `MazeGenerator` (bit0=North, bit1=East, bit2=South, bit3=West).
+        maze: Row-major wall-bitmask grid.
         cell: The (x, y) cell to look around.
 
     Returns:
-        Adjacent (x, y) cells not blocked by a wall, within the maze
-        bounds, and not a solid "42" logo cell (mask 15).
+        Adjacent, in-bounds, non-wall cells.
     """
     height = len(maze)
     width = len(maze[0]) if height else 0
@@ -55,9 +53,7 @@ def bfs_distances(maze: List[List[int]], start: Cell) -> Dict[Cell, int]:
         start: The (x, y) cell to search from.
 
     Returns:
-        A mapping of reachable (x, y) cells to their distance from
-        `start` (0 for `start` itself), or an empty mapping if `start`
-        is outside the maze bounds.
+        A mapping of reachable cells to their distance from `start`.
     """
     if not _in_bounds(maze, start):
         return {}
@@ -82,8 +78,7 @@ def next_step_towards(maze: List[List[int]], start: Cell, goal: Cell) -> Cell:
         goal: Target (x, y) cell.
 
     Returns:
-        The neighboring cell to move to next, or `start` unchanged if
-        already at `goal`, or if `goal`/`start` is unreachable.
+        The next cell to move to, or `start` if there's no path.
     """
     if start == goal:
         return start
@@ -106,18 +101,13 @@ def farthest_cell_from(
         maze: List[List[int]], start: Cell, avoid: Cell) -> Cell:
     """Find the cell reachable from `start` that is farthest from `avoid`.
 
-    Used to pick a flee target for an edible ghost: search the area
-    reachable from the ghost's own position, and prefer whichever cell is
-    hardest for the player to reach.
-
     Args:
         maze: Row-major wall-bitmask grid.
-        start: The (x, y) cell to search reachability from (the ghost).
-        avoid: The (x, y) cell to maximize distance from (the player).
+        start: The (x, y) cell to search reachability from.
+        avoid: The (x, y) cell to maximize distance from.
 
     Returns:
-        The reachable cell with the greatest path distance from `avoid`.
-        Falls back to `start` if nothing farther is reachable.
+        The farthest reachable cell, or `start` if none is farther.
     """
     distances_from_avoid = bfs_distances(maze, avoid)
     reachable_from_start = bfs_distances(maze, start)

@@ -8,17 +8,12 @@ from maze.pathfinding import Cell, farthest_cell_from, next_step_towards
 
 
 class Ghost(ABC):
-    """Base class for a ghost moving autonomously through the maze.
-
-    Movement, state transitions, and fleeing are shared by every ghost.
-    Subclasses only implement `target_tile()`, which selects the cell to
-    chase while `CHASING` — that's the one thing that differs between
-    them.
+    """Base class for a ghost.
 
     Attributes:
-        name: Display name (e.g. "Blinky").
+        name: Display name.
         color: RGB color used for rendering.
-        home_corner: Spawn cell, and respawn target once eaten.
+        home_corner: Spawn and respawn cell.
         position: Current (x, y) cell.
         direction: Current facing direction.
         speed: Movement speed, in tiles per second.
@@ -34,17 +29,15 @@ class Ghost(ABC):
         frightened_seconds: float,
         respawn_seconds: float,
     ) -> None:
-        """Initialize a ghost at its home corner, chasing by default.
+        """Initialize a ghost at its home corner.
 
         Args:
-            name: Display name (e.g. "Blinky").
+            name: Display name.
             color: RGB color used for rendering.
-            home_corner: Spawn cell, and respawn target once eaten.
+            home_corner: Spawn and respawn cell.
             speed: Movement speed, in tiles per second.
-            frightened_seconds: How long `FRIGHTENED` lasts once
-                triggered (`config.frightened_seconds`).
-            respawn_seconds: How long `EATEN` lasts before respawning
-                (`config.ghost_respawn_seconds`).
+            frightened_seconds: Duration of the `FRIGHTENED` state.
+            respawn_seconds: Duration of the `EATEN` state.
         """
         self.name = name
         self.color = color
@@ -64,18 +57,14 @@ class Ghost(ABC):
         self._state_timer = 0.0
 
     def frighten(self) -> None:
-        """Make the ghost edible, e.g. after a super-pacgum is eaten.
-
-        No effect if the ghost is already `EATEN` — its eyes returning
-        home can't be scared.
-        """
+        """Make the ghost edible. No effect if already `EATEN`."""
         if self.state is GhostState.EATEN:
             return
         self.state = GhostState.FRIGHTENED
         self._state_timer = self.frightened_seconds
 
     def get_eaten(self) -> None:
-        """Transition to `EATEN` after being caught while frightened."""
+        """Transition to `EATEN`."""
         self.state = GhostState.EATEN
         self._state_timer = self.respawn_seconds
 
@@ -84,7 +73,7 @@ class Ghost(ABC):
         return self.state is GhostState.FRIGHTENED
 
     def is_eaten(self) -> bool:
-        """Return whether the ghost is eaten (eyes en route home)."""
+        """Return whether the ghost has been eaten."""
         return self.state is GhostState.EATEN
 
     def update(
@@ -94,13 +83,13 @@ class Ghost(ABC):
         player: Player,
         ghosts: List["Ghost"],
     ) -> None:
-        """Advance the ghost's state and move it one step towards its target.
+        """Advance state and move one step towards the current target.
 
         Args:
             dt: Elapsed seconds since the last update.
             maze: Row-major wall-bitmask grid of the current level.
-            player: The player entity, used as the chase/flee reference.
-            ghosts: Every ghost in the level (Inky needs Blinky's cell).
+            player: The player entity.
+            ghosts: Every ghost in the level.
         """
         self._tick_state(dt)
 
@@ -123,7 +112,7 @@ class Ghost(ABC):
         player: Player,
         ghosts: List["Ghost"],
     ) -> Cell:
-        """Select the cell to chase while in `GhostState.CHASING`.
+        """Select the cell to chase while `CHASING`.
 
         Args:
             maze: Row-major wall-bitmask grid of the current level.
@@ -131,14 +120,12 @@ class Ghost(ABC):
             ghosts: Every ghost in the level.
 
         Returns:
-            The (x, y) cell this ghost should path towards. It doesn't
-            need to be reachable or in bounds — pathfinding falls back
-            to standing still if it isn't.
+            The (x, y) cell this ghost should path towards.
         """
         raise NotImplementedError
 
     def _tick_state(self, dt: float) -> None:
-        """Count down the state timer, applying it once it runs out."""
+        """Count down the state timer and apply expiry transitions."""
         if self.state is GhostState.CHASING:
             return
         self._state_timer -= dt

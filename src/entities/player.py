@@ -13,32 +13,30 @@ MAX_HIGHSCORE_ENTRIES = 10
 
 
 class Player:
-    """Tracks the human player's live state for one game session.
-
-    The player's name is unknown at game start (classic arcade flow: it's
-    only entered at game over, and only if the score makes the top 10),
-    so `name` starts empty and is set later via `set_name()`.
+    """The human player's live state for one game session.
 
     Attributes:
-        name: Player name, entered at game over and saved to highscores.
+        name: Player name.
         lives: Remaining lives.
         score: Accumulated score.
         position: Current (x, y) cell in the maze.
-        direction: Current facing direction, updated on every move (also
-            used by ghosts, e.g. Pinky's ambush targeting).
+        direction: Current facing direction.
+        speed: Base movement speed, in tiles per second.
     """
 
-    def __init__(self, lives: int) -> None:
-        """Initialize a new player at the start of a game.
+    def __init__(self, lives: int, speed: float) -> None:
+        """Initialize a new player.
 
         Args:
-            lives: Starting number of lives, typically `config.lives`.
+            lives: Starting number of lives.
+            speed: Base movement speed.
         """
         self.name = ""
         self.lives = lives
         self.score = 0
         self.position: Tuple[int, int] = (0, 0)
         self.direction = Direction.EAST
+        self.speed = speed
         self._start_time = time.monotonic()
 
     def move_to(
@@ -53,12 +51,10 @@ class Player:
         self.direction = direction
 
     def set_name(self, name: str) -> None:
-        """Set the player's name, entered at game over.
+        """Set the player's name.
 
         Args:
-            name: Candidate name. Falls back to `DEFAULT_NAME` if it
-                doesn't satisfy the highscore naming rules (max 10
-                characters, alphanumeric and spaces only).
+            name: Candidate name.
         """
         self.name = self._validate_name(name)
 
@@ -75,10 +71,19 @@ class Player:
         """Remove one life from the player.
 
         Returns:
-            True if the player has no lives left (game over).
+            True if the player has no lives left.
         """
         self.lives = max(0, self.lives - 1)
         return self.is_game_over()
+
+    def add_life(self, count: int = 1) -> None:
+        """Add extra lives to the player.
+
+        Args:
+            count: Number of lives to add.
+        """
+        if count > 0:
+            self.lives += count
 
     def is_game_over(self) -> bool:
         """Return whether the player has run out of lives."""
@@ -89,7 +94,7 @@ class Player:
         return time.monotonic() - self._start_time
 
     def to_score(self) -> Score:
-        """Convert the player's current score into a highscore entry.
+        """Convert to a highscore entry.
 
         Returns:
             A `Score` with this player's name and score.
@@ -103,8 +108,7 @@ class Player:
             highscores: The current highscore table.
 
         Returns:
-            True if the table isn't full yet, or if this score beats
-            its current lowest entry.
+            True if it qualifies.
         """
         if len(highscores.scores) < MAX_HIGHSCORE_ENTRIES:
             return True
@@ -114,14 +118,13 @@ class Player:
 
     @staticmethod
     def _validate_name(name: str) -> str:
-        """Sanitize a candidate player name against highscore rules.
+        """Sanitize a candidate player name.
 
         Args:
             name: Raw candidate name.
 
         Returns:
-            `name` unchanged if it satisfies the naming rules, otherwise
-            `DEFAULT_NAME`.
+            `name` if valid, otherwise `DEFAULT_NAME`.
         """
         if isinstance(name, str) and 1 <= len(name) <= NAME_MAX_LENGTH \
                 and NAME_PATTERN.match(name):

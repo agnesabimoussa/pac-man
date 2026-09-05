@@ -27,8 +27,6 @@ class Parser:
     def open_config(self) -> Dict[str, Any]:
         """Read the config file and decode it as JSON.
 
-        Strips full-line '#' and '//' comments before decoding.
-
         Returns:
             The raw, unvalidated configuration as a dict.
 
@@ -66,9 +64,6 @@ class Parser:
     def _strip_comments(text: str) -> str:
         """Remove full-line '#' and '//' comments from raw config text.
 
-        Only lines whose first non-whitespace characters are '#' or '//'
-        are dropped; content on the same line as real JSON is left alone.
-
         Args:
             text: Raw file content.
 
@@ -86,18 +81,14 @@ class Parser:
     def parse_config(self) -> GameConfiguration:
         """Validate the raw config into a GameConfiguration.
 
-        Unknown keys are ignored. Any key with a missing or invalid value
-        (wrong type or out of range) falls back to its default, with a
-        warning logged for each — the whole file is only ever rejected for
-        the unrecoverable cases handled in open_config().
+        Unknown keys are ignored; invalid values fall back to their
+        default, with a warning logged for each.
 
         Returns:
             A fully populated, valid GameConfiguration.
 
         Raises:
-            InvalidSchema: Defensive fallback if a valid configuration
-                still couldn't be built (should not normally happen, since
-                every field has a valid default).
+            InvalidSchema: A valid configuration couldn't be built.
         """
         raw = self.open_config()
         known_fields = set(GameConfiguration.model_fields)

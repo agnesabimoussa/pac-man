@@ -180,7 +180,8 @@ wall-bitmask grid (`src/maze/pathfinding.py`).
 
 ## States
 
-Every ghost (`Ghost`, `src/entities/ghost.py`) is one of three states:
+Every ghost (`Ghost`, `src/entities/ghosts/ghost.py`) is one of three
+states:
 
 - **`CHASING`** — default. Targets a cell chosen by its own chase
   strategy (see below) and paths towards it. Touching the player costs a
@@ -206,6 +207,33 @@ is a `Ghost` subclass overriding `target_tile()` (agreed in
 | `Pinky` | Ambush — targets a few cells ahead of the player, in the direction the player is currently facing. |
 | `Inky` | Flanking — targets the player's position reflected through Blinky's position; falls back to a random cell if no `Blinky` is present. |
 | `Clyde` | Shy — targets the player directly while far away, but retreats to its own home corner once within a short distance. |
+
+# Cheat Mode
+
+A cheat menu, available for peer review, lists every cheat below as its
+own entry rather than gating them behind one master on/off switch — each
+can be toggled or triggered independently at any time during play.
+
+## Toggles and values
+
+Backed by `CheatState` (`src/entities/cheat_state.py`), read by the game
+loop every tick:
+
+| Cheat | Kind | Effect |
+|---|---|---|
+| Invincibility | toggle | While on, ghosts never cost the player a life on contact. |
+| Ghost freeze | toggle | While on, ghosts stop moving (their `update()` is skipped entirely). |
+| Player speed | adjustable | Multiplies the player's base speed (`player.speed`); increase/decrease in fixed steps, clamped to a safe range so it can never reach zero or negative. |
+
+## One-shot actions
+
+Not tracked as state on `CheatState` — the menu triggers these directly,
+once, when selected:
+
+| Cheat | Effect |
+|---|---|
+| Extra life | Calls `Player.add_life()`, immediately adding a life. |
+| Level skip | Immediately completes the current level and advances to the next. |
 
 # Implementation
 

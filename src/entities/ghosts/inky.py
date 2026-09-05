@@ -8,11 +8,7 @@ from maze.pathfinding import Cell
 
 
 class Inky(Ghost):
-    """Flanking: mirrors the player's position through Blinky's position.
-
-    Reads as unpredictable since it depends on where Blinky is. Falls
-    back to a random tile if no `Blinky` is among `ghosts`.
-    """
+    """Flanking: mirrors the player's position through Blinky's position."""
 
     def target_tile(
         self,

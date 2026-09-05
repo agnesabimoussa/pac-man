@@ -23,22 +23,15 @@ class MazeLoader:
         """Store maze parameters shared by every level.
 
         Args:
-            width: Maze width in cells, used for every level.
-            height: Maze height in cells, used for every level.
+            width: Maze width in cells.
+            height: Maze height in cells.
             level_count: Total number of levels in the game.
             seed: Fixed seed for level 1; a value <= `random_seed_marker`
                 (or `None`) means level 1 is random too.
-            perfect: Passed straight through to `MazeGenerator`. The
-                subject requires this stay `False` in the real game
-                (braided, no dead ends); exposed here rather than
-                hardcoded inline so it stays overridable for tests.
-            entry_cell: Passed straight through to `MazeGenerator`.
-                Unused by gameplay (no route-finding needed), kept at the
-                library's own default.
-            exit_cell: Passed straight through to `MazeGenerator`.
-                Unused by gameplay, kept at the library's own default.
-            random_seed_marker: The seed value that means "generate
-                randomly" to the underlying library.
+            perfect: Passed through to `MazeGenerator`.
+            entry_cell: Passed through to `MazeGenerator`.
+            exit_cell: Passed through to `MazeGenerator`.
+            random_seed_marker: The seed value that means "random".
         """
         self.width = width
         self.height = height

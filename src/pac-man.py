@@ -18,7 +18,7 @@ def main() -> None:
         highscores = HighscoreLoader(config.highscore_filename).load()
         print(highscores)
 
-        player = Player(config.lives)
+        player = Player(config.lives, config.player_speed)
         print(f"Player created with {player.lives} lives.")
     except Exception as e:
         print(e)
