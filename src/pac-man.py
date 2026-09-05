@@ -1,5 +1,6 @@
 import sys
 from parser import Parser
+from entities.player import Player
 from errors.file_errors import InvalidProgramArguments
 from highscore.loader import HighscoreLoader
 
@@ -16,6 +17,9 @@ def main() -> None:
 
         highscores = HighscoreLoader(config.highscore_filename).load()
         print(highscores)
+
+        player = Player(config.lives)
+        print(f"Player created with {player.lives} lives.")
     except Exception as e:
         print(e)
 
