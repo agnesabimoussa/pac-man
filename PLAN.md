@@ -29,24 +29,24 @@
 
 ## aabi-mou — Core / Game Logic / Data
 
-- [ ] Configuration: define and document all config keys, defaults, and
+- [x] Configuration: define and document all config keys, defaults, and
       graceful handling of missing/invalid/unknown values.
-- [ ] Maze integration: wrap the assigned maze-generator package, handle the
+- [x] Maze integration: wrap the assigned maze-generator package, handle the
       fixed seed for level 1 vs. random for later levels, handle generation
       failures cleanly.
-- [ ] Game state & entities: player and ghost movement rules, pacgum and
+- [x] Game state & entities: player and ghost movement rules, pacgum and
       super-pacgum placement and consumption, collisions.
-- [ ] Ghost behavior: chase logic when not edible, flee logic when edible,
+- [x] Ghost behavior: chase logic when not edible, flee logic when edible,
       respawn behavior after being eaten.
-- [ ] Level & scoring rules: score increases, lives, level win/lose
+- [x] Level & scoring rules: score increases, lives, level win/lose
       conditions, level time limit, progression across levels.
-- [ ] Cheat mode (logic side): invincibility, level skip, ghost freeze, extra
+- [x] Cheat mode (logic side): invincibility, level skip, ghost freeze, extra
       lives, speed boost, or other useful states — exposed for the UI layer
       to trigger.
-- [ ] Highscore system: persistent storage, validation of names/scores,
+- [x] Highscore system: persistent storage, validation of names/scores,
       top-10 tracking, load at start / save at end.
 - [ ] Tests covering the above.
-- [ ] README sections: Configuration, Highscore, Maze Generation.
+- [x] README sections: Configuration, Highscore, Maze Generation.
 
 ## miissa — Rendering / UI / Pygame
 

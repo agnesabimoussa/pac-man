@@ -49,6 +49,7 @@ class Ghost(ABC):
         self.position = home_corner
         self.state = GhostState.CHASING
         self._state_timer = 0.0
+        self._move_cooldown = 0.0
 
     def reset(self) -> None:
         """Place the ghost back at its home corner, chasing again."""
@@ -92,6 +93,11 @@ class Ghost(ABC):
             ghosts: Every ghost in the level.
         """
         self._tick_state(dt)
+
+        self._move_cooldown -= dt
+        if self._move_cooldown > 0:
+            return
+        self._move_cooldown += 1.0 / self.speed
 
         if self.state is GhostState.CHASING:
             target = self.target_tile(maze, player, ghosts)

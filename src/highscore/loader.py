@@ -6,6 +6,8 @@ from pydantic import ValidationError
 
 from schemas.highscores import Highscores, Score
 
+MAX_HIGHSCORE_ENTRIES = 10
+
 
 class HighscoreLoader:
     """Loads the persistent highscore table from disk."""
@@ -49,16 +51,46 @@ class HighscoreLoader:
         valid_scores = self._parse_entries(data["scores"])
         valid_scores.sort(key=lambda entry: (-entry.score, entry.name))
 
-        if len(valid_scores) > 10:
+        if len(valid_scores) > MAX_HIGHSCORE_ENTRIES:
             self._warn(
-                f"{self.filename} has more than 10 valid entries; "
-                "keeping only the top 10.")
-            valid_scores = valid_scores[:10]
+                f"{self.filename} has more than {MAX_HIGHSCORE_ENTRIES} "
+                "valid entries; keeping only the top ones.")
+            valid_scores = valid_scores[:MAX_HIGHSCORE_ENTRIES]
 
         try:
             return Highscores(scores=valid_scores)
         except ValidationError:
             return Highscores()
+
+    def save(self, highscores: Highscores) -> None:
+        """Persist the highscore table to disk.
+
+        Args:
+            highscores: The table to save.
+        """
+        try:
+            with open(self.filename, "w", encoding="utf-8") as fd:
+                fd.write(highscores.model_dump_json(indent=2))
+        except OSError as exc:
+            self._warn(f"could not save to {self.filename}: {exc}")
+
+    def record(self, score: Score, highscores: Highscores) -> Highscores:
+        """Insert a new score, keep the top entries, and persist the result.
+
+        Args:
+            score: The new score to insert.
+            highscores: The current highscore table.
+
+        Returns:
+            The updated, saved highscore table.
+        """
+        scores = sorted(
+            list(highscores.scores) + [score],
+            key=lambda entry: (-entry.score, entry.name),
+        )[:MAX_HIGHSCORE_ENTRIES]
+        updated = Highscores(scores=scores)
+        self.save(updated)
+        return updated
 
     def _parse_entries(self, raw_entries: list[Any]) -> list[Score]:
         """Validate each raw entry on its own, dropping invalid ones.

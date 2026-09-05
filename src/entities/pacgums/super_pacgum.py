@@ -1,7 +1,7 @@
 from typing import List
 
 from entities.ghosts.ghost import Ghost
-from entities.pacgum import Pacgum
+from entities.pacgums.pacgum import Pacgum
 
 
 class SuperPacgum(Pacgum):

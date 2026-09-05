@@ -1,5 +1,5 @@
 import sys
-from parser import Parser
+from parsing.parser import Parser
 from entities.player import Player
 from errors.file_errors import InvalidProgramArguments
 from highscore.loader import HighscoreLoader
