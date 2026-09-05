@@ -1,22 +1,10 @@
-import random
 from abc import ABC, abstractmethod
-from enum import Enum
-from typing import List, Optional, Tuple
+from typing import List, Tuple
 
 from entities.direction import Direction
+from entities.ghosts.ghost_state import GhostState
 from entities.player import Player
 from maze.pathfinding import Cell, farthest_cell_from, next_step_towards
-
-AMBUSH_TILES_AHEAD = 4
-CLYDE_SHY_DISTANCE = 8
-
-
-class GhostState(Enum):
-    """Lifecycle state of a ghost."""
-
-    CHASING = "chasing"
-    FRIGHTENED = "frightened"
-    EATEN = "eaten"
 
 
 class Ghost(ABC):
@@ -25,7 +13,7 @@ class Ghost(ABC):
     Movement, state transitions, and fleeing are shared by every ghost.
     Subclasses only implement `target_tile()`, which selects the cell to
     chase while `CHASING` — that's the one thing that differs between
-    them (see `aabi-mou/GHOSTS.md`).
+    them.
 
     Attributes:
         name: Display name (e.g. "Blinky").
@@ -168,86 +156,3 @@ class Ghost(ABC):
             if direction.delta == (dx, dy):
                 return direction
         return self.direction
-
-
-class Blinky(Ghost):
-    """Direct chase: always targets the player's current cell."""
-
-    def target_tile(
-        self,
-        maze: List[List[int]],
-        player: Player,
-        ghosts: List["Ghost"],
-    ) -> Cell:
-        """Target the player's current cell."""
-        return player.position
-
-
-class Pinky(Ghost):
-    """Ambush: targets a few tiles ahead of the player, cutting them off."""
-
-    def target_tile(
-        self,
-        maze: List[List[int]],
-        player: Player,
-        ghosts: List["Ghost"],
-    ) -> Cell:
-        """Target a point `AMBUSH_TILES_AHEAD` cells past the player."""
-        dx, dy = player.direction.delta
-        x, y = player.position
-        return (x + dx * AMBUSH_TILES_AHEAD, y + dy * AMBUSH_TILES_AHEAD)
-
-
-class Inky(Ghost):
-    """Flanking: mirrors the player's position through Blinky's position.
-
-    Reads as unpredictable since it depends on where Blinky is. Falls
-    back to a random tile if no `Blinky` is among `ghosts`.
-    """
-
-    def target_tile(
-        self,
-        maze: List[List[int]],
-        player: Player,
-        ghosts: List["Ghost"],
-    ) -> Cell:
-        """Target the player's position reflected through Blinky's."""
-        blinky = self._find_blinky(ghosts)
-        if blinky is None:
-            return self._random_cell(maze)
-        blinky_x, blinky_y = blinky.position
-        player_x, player_y = player.position
-        return (2 * player_x - blinky_x, 2 * player_y - blinky_y)
-
-    @staticmethod
-    def _find_blinky(ghosts: List["Ghost"]) -> Optional[Blinky]:
-        """Find the `Blinky` instance among `ghosts`, if any."""
-        for ghost in ghosts:
-            if isinstance(ghost, Blinky):
-                return ghost
-        return None
-
-    @staticmethod
-    def _random_cell(maze: List[List[int]]) -> Cell:
-        """Pick a uniformly random cell within the maze's bounds."""
-        height = len(maze)
-        width = len(maze[0]) if height else 0
-        return (random.randrange(width), random.randrange(height))
-
-
-class Clyde(Ghost):
-    """Shy: chases directly from afar, but scatters home once close."""
-
-    def target_tile(
-        self,
-        maze: List[List[int]],
-        player: Player,
-        ghosts: List["Ghost"],
-    ) -> Cell:
-        """Target the player if far away, otherwise retreat home."""
-        player_x, player_y = player.position
-        x, y = self.position
-        distance = abs(player_x - x) + abs(player_y - y)
-        if distance > CLYDE_SHY_DISTANCE:
-            return player.position
-        return self.home_corner
